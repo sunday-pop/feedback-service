@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: feedback-service
+
+logging:
+  level:
+    org.springframework.security.web.FilterChainProxy: DEBUG
