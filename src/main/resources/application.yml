@@ -1,6 +1,8 @@
 spring:
   application:
     name: feedback-service
+  profiles:
+    active: dev
 
 logging:
   level:
