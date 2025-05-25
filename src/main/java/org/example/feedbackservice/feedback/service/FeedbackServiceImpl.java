@@ -9,6 +9,7 @@ import org.example.feedbackservice.feedback.model.entity.PortfolioFeedback;
 import org.example.feedbackservice.feedback.model.repository.PortfolioFeedbackRepository;
 import org.example.feedbackservice.global.exception.FeedbackNotFoundException;
 import org.example.feedbackservice.global.exception.NotCompletedSummaryException;
+import org.example.feedbackservice.global.exception.SummaryNotFoundException;
 import org.example.feedbackservice.llm.client.LLMClient;
 import org.example.feedbackservice.summary.model.entity.PortfolioSummary;
 import org.example.feedbackservice.summary.model.entity.SummaryStatus;
@@ -33,6 +34,9 @@ public class FeedbackServiceImpl implements FeedbackService {
     public FeedbackResponse generateFeedback(FeedbackRequest request) {
 
         PortfolioSummary summary = summaryRepository.findByPortfolioId(request.portfolioId());
+        if (summary == null) {
+            throw new SummaryNotFoundException("요약이 존재하지 않습니다.");
+        }
 
         if (!summary.getStatus().equals(SummaryStatus.COMPLETED)) {
             log.info("요약이 완료되지 않았습니다.");
@@ -42,14 +46,12 @@ public class FeedbackServiceImpl implements FeedbackService {
         String finalSummary = summary.getFinalSummary();
         PortfolioFeedback prevFeedback = portfolioFeedbackRepository.findTopByPortfolioIdOrderByCreatedAtDesc(request.portfolioId());
 
-        // 추가 데이터 (포트폴리오설명 + 노트내용)
-        String description = request.description();
+        // 추가 데이터 (노트내용)
         String noteContent = request.noteContent();
         String data = """
-                    [포트폴리오 설명] %s
                     [노트 내용] %s
                     [포트폴리오 요약] %s
-                    """.formatted(description, noteContent, finalSummary);
+                    """.formatted(noteContent, finalSummary);
         boolean isFirst = true;
 
         // 이전 피드백 유무에 따라 분기
@@ -87,7 +89,11 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     @Transactional(readOnly = true)  // 읽기 전용 트랜잭션
     public FeedbackResponse getLatestFeedback(String portfolioId, Long noteId) {
-        return portfolioFeedbackRepository.findLatestFeedback(portfolioId, noteId);
+        FeedbackResponse latest = portfolioFeedbackRepository.findLatestFeedback(portfolioId, noteId);
+        if (latest == null) {
+            throw new FeedbackNotFoundException("등록된 피드백이 없습니다.");
+        }
+        return latest;
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package org.example.feedbackservice.summary.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.example.feedbackservice.global.exception.SummaryNotFoundException;
 import org.example.feedbackservice.llm.service.LLMSummaryService;
 import org.example.feedbackservice.summary.model.dto.SummaryRequest;
 import org.example.feedbackservice.summary.model.dto.SummaryResponse;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ public class SummaryServiceImpl implements SummaryService {
     private final GitHubService gitHubService;
     private final FileReadService fileReadService;
     private final LLMSummaryService llmSummaryService;
-    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
      * 포트폴리오 분석 처리 (쓰기 작업)
@@ -64,6 +63,9 @@ public class SummaryServiceImpl implements SummaryService {
     @Override
     public SummaryStatusResponse checkSummaryStatus(String portfolioId) {
         PortfolioSummary summary = summaryRepository.findByPortfolioId(portfolioId);
+        if (summary == null) {
+            throw new SummaryNotFoundException("요약 정보를 찾을 수 없습니다.");
+        }
         return new SummaryStatusResponse(summary.getStatus());
     }
 
@@ -88,6 +90,7 @@ public class SummaryServiceImpl implements SummaryService {
      * - 각 단계별 상태 업데이트는 별도 트랜잭션으로 처리
      */
     private void startAsyncAnalysis(PortfolioSummary summary, AnalysisData data) {
+        log.info("startAsyncAnalysis");
         extractGithubTexts(data.githubUrls)
                 .flatMap(githubTexts ->
                         Mono.zip(
@@ -95,7 +98,7 @@ public class SummaryServiceImpl implements SummaryService {
                                 processFileData(summary, data.fileUrls)
                         )
                 )
-                .flatMap(tuple -> generateFinalSummary(tuple.getT1(), tuple.getT2()))
+                .flatMap(tuple -> generateFinalSummary(data.description, tuple.getT1(), tuple.getT2()))
                 .doOnSuccess(finalSummary -> completeSummary(summary, finalSummary))
                 .doOnError(error -> failSummary(summary, error))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -105,8 +108,8 @@ public class SummaryServiceImpl implements SummaryService {
     /**
      * 최종 요약 생성
      */
-    private Mono<String> generateFinalSummary(String githubSummary, String fileSummary) {
-        String combined = githubSummary + "\n" + fileSummary;
+    private Mono<String> generateFinalSummary(String description, String githubSummary, String fileSummary) {
+        String combined = description + "\n" + githubSummary + "\n" + fileSummary;
         return (combined.length() > MAX_SAFE_LENGTH)
                 ? llmSummaryService.summarizeCombinedText(combined)
                 : Mono.just(combined);
@@ -201,6 +204,7 @@ public class SummaryServiceImpl implements SummaryService {
      * 분석 중단 처리
      */
     private void abortSummary(PortfolioSummary summary) {
+        log.info("abortSummary!");
         summary.setStatus(SummaryStatus.NOT_STARTED);
         summaryRepository.save(summary);
     }
@@ -210,6 +214,7 @@ public class SummaryServiceImpl implements SummaryService {
      */
     private AnalysisData extractAnalysisData(SummaryRequest request) {
         return new AnalysisData(
+                request.description(),
                 request.urls(),
                 extractFileTexts(request.fileUrls())
         );
@@ -234,6 +239,7 @@ public class SummaryServiceImpl implements SummaryService {
      */
     @Transactional(readOnly = true)
     protected List<String> extractFileTexts(List<String> fileUrls) {
+        log.info("extractFileTexts : " + fileUrls.toString());
         // 파일이 있는지 확인
         if (fileUrls == null || fileUrls.isEmpty()) {
             return Collections.emptyList();
@@ -267,10 +273,10 @@ public class SummaryServiceImpl implements SummaryService {
                 .orElse(Mono.just(Collections.emptyList()));
     }
 
-    private record AnalysisData(List<String> githubUrls, List<String> fileUrls) {
+    private record AnalysisData(String description, List<String> githubUrls, List<String> fileUrls) {
         boolean isEmpty() {
-            return (githubUrls == null || githubUrls.isEmpty())
-                    && fileUrls == null || fileUrls.isEmpty();
+            return description == null && (githubUrls == null || githubUrls.isEmpty())
+                    && (fileUrls == null || fileUrls.isEmpty());
         }
     }
 }

@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/summary")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:8090") // NOTE: 포트폴리오서비스 명시
 public class SummaryController {
 
     private final SummaryService summaryService;
 
     // 요약 요청
-    @PostMapping
+    @PostMapping("/request")
     public ResponseEntity<Void> requestSummary(@RequestBody SummaryRequest request) {
         summaryService.handleSummary(request);
         return ResponseEntity.noContent().build();

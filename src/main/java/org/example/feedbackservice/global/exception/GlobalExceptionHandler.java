@@ -22,5 +22,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleFeedbackNotFound(FeedbackNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(SummaryNotFoundException.class)
+    public ResponseEntity<String> handleSummaryNotFound(SummaryNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
 

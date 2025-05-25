@@ -54,7 +54,7 @@ public class SummaryPromptBuilder implements PromptBuilder {
                     문서 내용: %s
                     """.formatted(content);
             case "combined" -> """
-                    다음은 GitHub 프로젝트의 요약 내용과 포트폴리오 문서의 요약 내용입니다. 이 두 자료를 기반으로 아래 항목을 기준으로 최종 요약을 작성해주세요.
+                    다음은 사용자의 포트폴리오 설명과 GitHub 프로젝트의 요약 내용, 포트폴리오 관련 첨부 파일의 요약 내용입니다. 이 정보를 기반으로 아래 항목을 기준으로 최종 요약을 작성해주세요.
                     
                     [요약 목적]
                     - 프로젝트의 전체 내용을 빠르게 이해하고, 효과적인 피드백을 제공할 수 있도록 내용을 정리합니다.
