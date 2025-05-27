@@ -2,6 +2,7 @@ package org.example.feedbackservice.feedback.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.example.feedbackservice.feedback.model.dto.BatchFeedbackRequest;
 import org.example.feedbackservice.feedback.model.dto.FeedbackRequest;
 import org.example.feedbackservice.feedback.model.dto.FeedbackResponse;
 import org.example.feedbackservice.feedback.model.entity.FeedbackStatus;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -122,4 +125,22 @@ public class FeedbackServiceImpl implements FeedbackService {
         return feedback;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<FeedbackResponse> getBatchLatestFeedbacks(BatchFeedbackRequest request) {
+        List<FeedbackResponse> results = new ArrayList<>();
+
+        for (Long noteId : request.noteIds()) {
+            try {
+                FeedbackResponse feedback = getLatestFeedback(request.portfolioId(), noteId);
+                if (feedback != null) {
+                    results.add(feedback);
+                }
+            } catch (Exception e) {
+                log.warning("배치 처리 중 개별 피드백 조회 실패 - noteId: %s".formatted(noteId));
+                log.warning(e.getMessage());
+            }
+        }
+        return results;
+    }
 }

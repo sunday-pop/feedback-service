@@ -2,7 +2,7 @@ spring:
   application:
     name: feedback-service
   profiles:
-    active: prod
+    active: dev
 
 logging:
   level:

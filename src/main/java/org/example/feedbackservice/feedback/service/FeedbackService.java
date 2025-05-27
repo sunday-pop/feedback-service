@@ -1,5 +1,6 @@
 package org.example.feedbackservice.feedback.service;
 
+import org.example.feedbackservice.feedback.model.dto.BatchFeedbackRequest;
 import org.example.feedbackservice.feedback.model.dto.FeedbackRequest;
 import org.example.feedbackservice.feedback.model.dto.FeedbackResponse;
 
@@ -15,4 +16,5 @@ public interface FeedbackService {
 
     FeedbackResponse getLatestFeedback(String portfolioId, Long noteId);
 
+    List<FeedbackResponse> getBatchLatestFeedbacks(BatchFeedbackRequest request);
 }

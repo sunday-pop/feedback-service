@@ -1,6 +1,7 @@
 package org.example.feedbackservice.feedback.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.feedbackservice.feedback.model.dto.BatchFeedbackRequest;
 import org.example.feedbackservice.feedback.model.dto.FeedbackRequest;
 import org.example.feedbackservice.feedback.model.dto.FeedbackResponse;
 import org.example.feedbackservice.feedback.service.FeedbackService;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/feedback")
@@ -26,7 +28,7 @@ public class FeedbackController {
     }
 
     // 피드백 조회
-    @GetMapping("/{feedbackId}")
+    @GetMapping("/{feedbackId:\\d+}")
     public ResponseEntity<FeedbackResponse> getFeedback(@PathVariable Long feedbackId) {
         FeedbackResponse response = feedbackService.getFeedback(feedbackId);
         return ResponseEntity.ok(response);
@@ -53,4 +55,11 @@ public class FeedbackController {
     }
 
 
+    @PostMapping("/batch")
+    public ResponseEntity<List<FeedbackResponse>> getFeedbacksBatch(
+            @RequestBody BatchFeedbackRequest request) {
+
+        List<FeedbackResponse> feedbacks = feedbackService.getBatchLatestFeedbacks(request);
+        return ResponseEntity.ok(feedbacks);
+    }
 }
