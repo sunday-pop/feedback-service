@@ -7,3 +7,13 @@ spring:
 logging:
   level:
     org.springframework.security.web.FilterChainProxy: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
