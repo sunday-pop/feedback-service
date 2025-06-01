@@ -1,4 +1,4 @@
-package org.example.feedbackservice.global.exception;
+package org.example.feedbackservice.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

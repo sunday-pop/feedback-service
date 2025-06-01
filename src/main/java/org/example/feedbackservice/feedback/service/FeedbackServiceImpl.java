@@ -8,9 +8,9 @@ import org.example.feedbackservice.feedback.model.dto.FeedbackResponse;
 import org.example.feedbackservice.feedback.model.entity.FeedbackStatus;
 import org.example.feedbackservice.feedback.model.entity.PortfolioFeedback;
 import org.example.feedbackservice.feedback.model.repository.PortfolioFeedbackRepository;
-import org.example.feedbackservice.global.exception.FeedbackNotFoundException;
-import org.example.feedbackservice.global.exception.NotCompletedSummaryException;
-import org.example.feedbackservice.global.exception.SummaryNotFoundException;
+import org.example.feedbackservice.common.exception.FeedbackNotFoundException;
+import org.example.feedbackservice.common.exception.NotCompletedSummaryException;
+import org.example.feedbackservice.common.exception.SummaryNotFoundException;
 import org.example.feedbackservice.llm.client.LLMClient;
 import org.example.feedbackservice.summary.model.entity.PortfolioSummary;
 import org.example.feedbackservice.summary.model.entity.SummaryStatus;
@@ -21,7 +21,6 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

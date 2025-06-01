@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.example.feedbackservice.global.exception.GitHubManagementException;
+import org.example.feedbackservice.common.exception.GitHubManagementException;
 import org.example.feedbackservice.llm.service.LLMSummaryService;
 import org.example.feedbackservice.summary.model.dto.GitHubSummaryDTO;
 import org.example.feedbackservice.summary.service.analyzer.CodeAnalyzer;

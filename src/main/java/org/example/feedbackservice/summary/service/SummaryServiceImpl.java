@@ -2,7 +2,7 @@ package org.example.feedbackservice.summary.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.example.feedbackservice.global.exception.SummaryNotFoundException;
+import org.example.feedbackservice.common.exception.SummaryNotFoundException;
 import org.example.feedbackservice.llm.service.LLMSummaryService;
 import org.example.feedbackservice.summary.model.dto.SummaryRequest;
 import org.example.feedbackservice.summary.model.dto.SummaryResponse;
@@ -11,7 +11,6 @@ import org.example.feedbackservice.summary.model.entity.PortfolioSummary;
 import org.example.feedbackservice.summary.model.entity.SummaryStatus;
 import org.example.feedbackservice.summary.model.repository.PortfolioSummaryRepository;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
