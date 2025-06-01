@@ -1,6 +1,8 @@
-package org.example.feedbackservice.global.security;
+package org.example.feedbackservice.global.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.feedbackservice.global.jwt.JwtAuthenticationFilter;
+import org.example.feedbackservice.global.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -21,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,13 +40,13 @@ public class SecurityConfig {
 
                 // 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll())
-//                        .anyRequest().authenticated())                   //  인증 필요
+//                        .requestMatchers("/**").permitAll())
+                        .anyRequest().authenticated())                   //  인증 필요
 
-                // JWT 필터 추가
-//                .addFilterBefore(
-//                        new JwtAuthenticationFilter(jwtTokenProvider),
-//                        UsernamePasswordAuthenticationFilter.class)
+//                 JWT 필터 추가
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();
