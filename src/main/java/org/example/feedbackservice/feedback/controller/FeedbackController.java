@@ -10,12 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/feedback")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:8090") // NOTE:포트폴리오서비스 주소 명시
 public class FeedbackController {
 
     private final FeedbackService feedbackService;
